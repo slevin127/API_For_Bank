@@ -1,0 +1,13 @@
+target/
+.idea/
+*.iml
+.DS_Store
+out/
+build/
+*.log
+
+# VS Code
+.vscode/
+
+# Maven wrapper cache (если появится)
+.mvn/wrapper/maven-wrapper.jar
