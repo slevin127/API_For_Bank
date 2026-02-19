@@ -26,6 +26,13 @@ public class BankService {
         this.operationRepository = operationRepository;
     }
 
+    /**
+     * Returns current balance for a user.
+     *
+     * @param userId user identifier
+     * @return balance DTO
+     * @throws BusinessException if user account does not exist
+     */
     @Transactional(readOnly = true)
     public BalanceResponse getBalance(Long userId) {
         Account account = accountRepository.findById(userId)
@@ -33,6 +40,13 @@ public class BankService {
         return new BalanceResponse(userId, account.getBalance());
     }
 
+    /**
+     * Withdraws money from a user account and writes operation history.
+     *
+     * @param userId user identifier
+     * @param amount withdraw amount
+     * @throws BusinessException if user does not exist or balance is insufficient
+     */
     @Transactional
     public void withdraw(Long userId, BigDecimal amount) {
         Account account = accountRepository.findByUserId(userId)
@@ -45,6 +59,13 @@ public class BankService {
         saveOperation(userId, OperationType.WITHDRAW, amount, null);
     }
 
+    /**
+     * Deposits money to a user account and writes operation history.
+     *
+     * @param userId user identifier
+     * @param amount deposit amount
+     * @throws BusinessException if user does not exist
+     */
     @Transactional
     public void deposit(Long userId, BigDecimal amount) {
         Account account = accountRepository.findByUserId(userId)
@@ -54,6 +75,16 @@ public class BankService {
         saveOperation(userId, OperationType.DEPOSIT, amount, null);
     }
 
+    /**
+     * Returns user operation list for a date range.
+     * If {@code from} or {@code to} is null, default bounds are used.
+     *
+     * @param userId user identifier
+     * @param from range start, nullable
+     * @param to range end, nullable
+     * @return operation list sorted by date descending
+     * @throws BusinessException if user does not exist or range is invalid
+     */
     @Transactional(readOnly = true)
     public List<OperationItemResponse> getOperationList(Long userId, OffsetDateTime from, OffsetDateTime to) {
         accountRepository.findById(userId)
@@ -76,6 +107,15 @@ public class BankService {
                 .toList();
     }
 
+    /**
+     * Transfers money between two users and writes two operation records:
+     * outgoing for sender and incoming for receiver.
+     *
+     * @param fromUserId sender user identifier
+     * @param toUserId receiver user identifier
+     * @param amount transfer amount
+     * @throws BusinessException if users are same, users are missing, or sender has insufficient funds
+     */
     @Transactional
     public void transfer(Long fromUserId, Long toUserId, BigDecimal amount) {
         if (fromUserId.equals(toUserId)) {

@@ -22,6 +22,10 @@ mvn spring-boot:run
 ## API
 Базовый URL: `http://localhost:8080/api/v1/bank`
 
+Swagger:
+- UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
 ### 1. Узнать баланс
 `GET /getBalance?userId=1`
 

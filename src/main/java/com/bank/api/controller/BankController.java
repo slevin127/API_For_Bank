@@ -30,24 +30,37 @@ public class BankController {
         this.bankService = bankService;
     }
 
+    /**
+     * Returns current user balance.
+     */
     @GetMapping("/getBalance")
     public ApiResponse<BalanceResponse> getBalance(@RequestParam @NotNull Long userId) {
         BalanceResponse data = bankService.getBalance(userId);
         return ApiResponse.ok(data.balance(), data);
     }
 
+    /**
+     * Withdraws money from user account.
+     */
     @PostMapping("/takeMoney")
     public ApiResponse<Void> takeMoney(@RequestParam @NotNull Long userId, @Valid @RequestBody AmountRequest request) {
         bankService.withdraw(userId, request.amount());
         return ApiResponse.ok(1, null);
     }
 
+    /**
+     * Deposits money to user account.
+     */
     @PostMapping("/putMoney")
     public ApiResponse<Void> putMoney(@RequestParam @NotNull Long userId, @Valid @RequestBody AmountRequest request) {
         bankService.deposit(userId, request.amount());
         return ApiResponse.ok(1, null);
     }
 
+    /**
+     * Returns operation history for the requested user and date range.
+     * Date bounds are optional.
+     */
     @GetMapping("/getOperationList")
     public ApiResponse<List<OperationItemResponse>> getOperationList(
             @RequestParam @NotNull Long userId,
@@ -58,6 +71,9 @@ public class BankController {
         return ApiResponse.ok(operations.size(), operations);
     }
 
+    /**
+     * Transfers money between users.
+     */
     @PostMapping("/transferMoney")
     public ApiResponse<Void> transferMoney(@Valid @RequestBody TransferRequest request) {
         bankService.transfer(request.fromUserId(), request.toUserId(), request.amount());
